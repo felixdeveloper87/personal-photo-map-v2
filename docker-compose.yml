@@ -40,7 +40,9 @@ services:
     depends_on:
      - backend
     env_file:
-      - .env 
+      - .env
+    environment:
+      - BACKEND_URL=http://localhost:8092   
     networks:
       - app-network
     ports:
