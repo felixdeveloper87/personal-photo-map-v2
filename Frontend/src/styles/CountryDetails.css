@@ -1,0 +1,116 @@
+/* CountryDetails.css */
+
+/* .country-details .country-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 20px; 
+}
+  .country-details .country-header h1 {
+    margin-bottom: 10px;
+  }
+  
+  .country-details .flag {
+    width: 450px; 
+    height: auto;
+  }
+.country-details {
+    padding: 20px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+    
+  .country-details p {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+  }
+  
+  .country-details .error-message {
+    color: red;
+    margin-bottom: 20px;
+  }
+  
+  .uploader-section {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .uploader-section .actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .country-details button {
+    padding: 8px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9em;
+  }
+  
+  .country-details button:hover {
+    background-color: #0056b3;
+  }
+  
+  .country-details .delete-all-button {
+    background-color: #dc3545;
+  }
+  
+  .country-details .delete-all-button:hover {
+    background-color: #a71d2a;
+  } */
+  
+  .years-section {
+    margin-bottom: 20px;
+  }
+  
+  .years-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .year-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .year-item .year-button {
+    background-color: #28a745;
+  }
+  
+  .year-item .year-button.selected-year {
+    background-color: #1e7e34;
+  }
+  
+  .year-item .delete-year-button {
+    background-color: #dc3545;
+  }
+  
+  .year-item .delete-year-button:hover {
+    background-color: #a71d2a;
+  }
+  
+  .years-section h2 {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+  }
+  
+  .photo-gallery {
+    margin-top: 20px;
+  }
+  .uploader-section {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }

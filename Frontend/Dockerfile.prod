@@ -1,0 +1,33 @@
+# Etapa 1: Construção do Frontend
+FROM node:18-alpine AS build
+
+WORKDIR /app
+
+# Copiar os arquivos do package.json para instalar dependências
+COPY package*.json ./
+
+# Instalar dependências
+RUN npm install
+
+# Copiar todo o código do frontend
+COPY . .
+
+# Criar o build de produção
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+RUN npm run build
+
+# Etapa 2: Servir com Nginx
+FROM nginx:stable-alpine
+
+# Remover os arquivos padrão do Nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copiar o build do React para a pasta do Nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copiar a configuração do Nginx
+COPY nginx.conf /etc/nginx/nginx.conf  
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

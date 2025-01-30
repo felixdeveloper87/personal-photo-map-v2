@@ -1,0 +1,30 @@
+# Ignorar arquivos de configuração sensíveis
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignorar dependências do Node.js (Frontend)
+Frontend/node_modules/
+Frontend/.vite/
+
+# Ignorar dependências do Maven (Backend)
+target/
+**/target/
+
+# Ignorar arquivos de log
+*.log
+logs/
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignorar arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar arquivos do Docker
+docker-compose.override.yml
+docker-compose.yml~

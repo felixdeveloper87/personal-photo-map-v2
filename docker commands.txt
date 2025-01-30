@@ -1,0 +1,42 @@
+docker run hello-world
+docker compose version
+docker ps
+docker ps -a // list all containers
+docker rm magical_volhard
+docker rm 8282c285ecea ( id do container) // delete
+docker container prune // delete all exited containers
+
+echo. > docker-compose.yml criar o arquivo pelo cmd
+notepad docker-compose.yml
+
+docker-compose down -v
+docker-compose up --build   mp render
+
+docker-compose -f docker-compose.dev.yml up --build   localmente
+http://localhost:8092/api/auth/users
+
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+cd Backend/photo-map
+mvn clean package
+mvn clean package -DskipTests
+
+docker logs postgres-container
+
+docker exec -it postgres-container psql -U postgres -d photo_map
+
+docker-compose down && docker-compose up --build
+
+
+
+
+
+
+
+
+
+
+
+
+
+
