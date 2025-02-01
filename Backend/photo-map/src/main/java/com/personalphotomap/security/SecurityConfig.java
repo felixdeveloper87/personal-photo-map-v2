@@ -56,28 +56,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-
-//        String frontendUrl = System.getenv("FRONTEND_URL");
-
-
-        List<String> allowedOrigins = new ArrayList<>();
-
-//        if (frontendUrl != null && !frontendUrl.isEmpty()) {
-//            allowedOrigins.add(frontendUrl);
-//        }
-
-        // Sempre permitir localhost para desenvolvimento local
-        configuration.setAllowedOrigins(List.of("http://localhost", "http://localhost:80", "http://localhost:5173"));
-
-//        allowedOrigins.add("https://backend-8pox.onrender.com");
-
-//        configuration.setAllowedOrigins(allowedOrigins);
+    
+        // Lista de domínios permitidos
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost", 
+            "http://localhost:80", 
+            "http://localhost:5173",
+            "https://personal-photo-map-v2.onrender.com" // FRONTEND DO RENDER
+        ));
+    
         configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));
-
+    
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
