@@ -10,8 +10,8 @@ export default defineConfig(({ mode }) => {
     define: {
       // Escolhe a URL do backend dependendo do ambiente
       'import.meta.env.VITE_BACKEND_URL': JSON.stringify(
-        mode === 'development' ? env.VITE_BACKEND_URL_LOCAL : env.VITE_BACKEND_URL
-      ),
+      env.VITE_BACKEND_URL || env.VITE_BACKEND_URL_LOCAL || 'https://personal-photomap-backend.onrender.com'
+),
     },
     server: {
       port: env.VITE_PORT || 5173, // Define a porta localmente
