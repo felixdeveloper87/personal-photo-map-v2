@@ -1,44 +1,39 @@
 package com.personalphotomap.service;
 
-import com.personalphotomap.dto.S3UploadResponseDTO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-
-
-import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
+import java.net.URL;
 import java.util.UUID;
+import software.amazon.awssdk.core.sync.RequestBody;
 
 @Service
-@RequiredArgsConstructor
 public class S3Service {
 
     private final S3Client s3Client;
 
-    // Correção: Pegando a variável correta do sistema
-    private final String bucketName = System.getenv("S3_BUCKET_NAME");
-
-    public S3UploadResponseDTO uploadFile(MultipartFile file) {
-        try {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
-                    .contentType(file.getContentType())
-                    .build();
-
-            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
-
-            String fileUrl = "https://" + bucketName + ".s3." + System.getenv("AWS_REGION") + ".amazonaws.com/" + fileName;
-            return new S3UploadResponseDTO(fileUrl);
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao fazer upload para S3", e);
-        }
+    // Construtor correto para injeção
+    public S3Service(S3Client s3Client) {
+        this.s3Client = s3Client;
     }
 
-}
+    public String uploadFile(MultipartFile file) {
+        try {
+            // Gera um nome único para o arquivo
+            String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
 
+            // Faz o upload para o S3
+            s3Client.putObject(
+                b -> b.bucket(System.getenv("PHOTO_MAP_STORAGE_BUCKET")).key(fileName),
+                RequestBody.fromBytes(file.getBytes())
+            );
+
+            // Obtém a URL do arquivo
+            URL fileUrl = s3Client.utilities().getUrl(b -> b.bucket(System.getenv("PHOTO_MAP_STORAGE_BUCKET")).key(fileName));
+
+            return fileUrl.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao enviar arquivo para o S3", e);
+        }
+    }
+}
