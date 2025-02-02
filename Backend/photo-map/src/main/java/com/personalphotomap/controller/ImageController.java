@@ -275,6 +275,16 @@ public class ImageController {
         return ResponseEntity.ok(images);  // Retorna a lista de imagens do usuário
     }
 
+    @PostMapping("/save")
+public ResponseEntity<String> saveImage(@RequestBody Image image) {
+    if (image.getFilePath() == null || image.getFilePath().isEmpty()) {
+        return ResponseEntity.badRequest().body("A URL da imagem (filePath) é obrigatória.");
+    }
+
+    imageRepository.save(image);
+    return ResponseEntity.ok("Imagem salva com sucesso.");
+}
+
 
     @GetMapping("/{countryId}/years")
     public ResponseEntity<List<Integer>> getYearsByCountry(

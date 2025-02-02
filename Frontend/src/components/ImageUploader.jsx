@@ -16,94 +16,70 @@ const ImageUploader = ({ countryId, onUpload, onUploadSuccess }) => {
     }
   };
 
-  const handleImageUpload = () => {
+  const handleImageUpload = async () => {
     if (files.length === 0) {
       alert('Nenhum arquivo selecionado.');
       return;
     }
-
+  
     const formData = new FormData();
-    const invalidFiles = [];
-    const validFiles = [];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-
-      if (file.type !== 'image/jpeg') {
-        invalidFiles.push(file.name);
-        continue;
-      }
-
-      validFiles.push(file);
-      formData.append('images', file);
-    }
-
-    if (validFiles.length === 0) {
-      alert('Nenhum arquivo válido selecionado. Por favor, selecione imagens JPG.');
-      return;
-    }
-
-    if (invalidFiles.length > 0) {
-      alert(`Os seguintes arquivos não são imagens JPG e foram ignorados: ${invalidFiles.join(', ')}`);
-    }
-
-    formData.append('countryId', countryId);
-    formData.append('year', year);
-
+    formData.append("file", files[0]); // O S3 aceita apenas um arquivo por vez
+  
     setIsUploading(true);
-
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/upload`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: formData,
-    })
-      .then(async (response) => {
-        const contentType = response.headers.get('content-type');
-        let data = null;
-
-        if (contentType && contentType.includes('application/json')) {
-          data = await response.json();
-        } else {
-          const text = await response.text();
-          throw new Error(`Resposta inesperada do servidor: ${text}`);
-        }
-
-        if (!response.ok) {
-          let errorMessage = data.error || 'Erro desconhecido.';
-          if (data.invalidFiles && data.invalidFiles.length > 0) {
-            errorMessage += `\nArquivos inválidos: ${data.invalidFiles.join(', ')}`;
-          }
-          throw new Error(errorMessage);
-        }
-
-        let message = data.message || 'Imagens carregadas com sucesso.';
-        if (data.invalidFiles && data.invalidFiles.length > 0) {
-          message += `\nOs seguintes arquivos foram ignorados por não serem imagens JPG: ${data.invalidFiles.join(', ')}`;
-        }
-        alert(message);
-
-        const newImages = data.imageUrls.map((url) => ({ url }));
-        onUpload(newImages, year);
-
-        if (onUploadSuccess) {
-          onUploadSuccess();
-        }
-
-        // Limpar o campo de arquivos
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''; // Limpa o campo de input
-        }
-        setFiles([]); // Limpa o estado dos arquivos selecionados
-      })
-      .catch((error) => {
-        console.error('Erro ao carregar as imagens:', error);
-        alert(`Erro ao carregar as imagens: ${error.message}`);
-      })
-      .finally(() => {
-        setIsUploading(false); // Define o estado de upload como falso após a conclusão
+  
+    try {
+      // Upload da imagem para o S3
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/s3/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
       });
+  
+      if (!response.ok) {
+        throw new Error('Erro ao enviar imagem para o S3.');
+      }
+  
+      const data = await response.json();
+      const imageUrl = data.imageUrls[0]; // URL da imagem no S3
+  
+      // Agora salvamos essa URL no banco
+      const saveResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          countryId,
+          year,
+          email: localStorage.getItem('email'), // Certifique-se de ter o email do usuário salvo
+          fileName: files[0].name,
+          filePath: imageUrl, // URL do S3
+        }),
+      });
+  
+      if (!saveResponse.ok) {
+        throw new Error('Erro ao salvar URL da imagem no banco de dados.');
+      }
+  
+      alert('Imagem enviada e salva com sucesso!');
+  
+      onUpload([{ url: imageUrl }], year);
+      
+      if (onUploadSuccess) {
+        onUploadSuccess();
+      }
+  
+      setFiles([]); // Limpar o input
+  
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      alert(`Erro ao fazer upload: ${error.message}`);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (

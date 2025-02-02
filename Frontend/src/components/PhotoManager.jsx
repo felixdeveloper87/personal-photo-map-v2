@@ -91,10 +91,11 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
             })
             .then((data) => {
                 if (Array.isArray(data)) {
-                    const imageUrls = data.map((image) => {
-                        const url = `${import.meta.env.VITE_BACKEND_URL}${image.filePath}`;
-                        return { url, id: image.id, year: image.year };
-                    });
+                    const imageUrls = data.map((image) => ({
+                        url: image.filePath, // Agora `filePath` contém a URL do S3
+                        id: image.id,
+                        year: image.year
+                    }));
                     console.log('Imagens processadas:', imageUrls);
                     setImages(imageUrls);
                 } else {
@@ -125,18 +126,31 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
             alert('Nenhuma imagem selecionada para deletar.');
             return;
         }
-
-        if (
-            window.confirm(
-                `Tem certeza que deseja deletar ${ids.length} imagem(ns)?`
-            )
-        ) {
+    
+        if (window.confirm(`Tem certeza que deseja deletar ${ids.length} imagem(ns)?`)) {
             const deletePromises = ids.map((id) =>
                 fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/delete/${id}`, {
                     method: 'DELETE',
                     headers: getAuthHeaders(),
                 })
             );
+    
+            Promise.all(deletePromises)
+                .then((responses) => {
+                    const failedResponses = responses.filter((response) => !response.ok);
+                    if (failedResponses.length > 0) {
+                        alert(`Erro ao deletar ${failedResponses.length} imagem(ns).`);
+                    } else {
+                        alert(`${ids.length} imagem(ns) deletada(s) com sucesso.`);
+                    }
+    
+                    refreshData();
+                })
+                .catch(() => {
+                    alert('Erro ao deletar as imagens.');
+                });
+        }
+    };
 
             Promise.all(deletePromises)
                 .then((responses) => {
@@ -162,7 +176,7 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
                 `Tem certeza que deseja deletar todas as imagens do ano ${year}?`
             )
         ) {
-            fetch(`${import.meta.env.VITE_BACKEND_URL}2/api/images/${countryId}/${year}`, {
+            fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/${countryId}/${year}`, {
                 method: 'DELETE',
                 headers: getAuthHeaders(),
             })
