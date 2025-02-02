@@ -152,22 +152,6 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
         }
     };
 
-    Promise.all(deletePromises)
-        .then((responses) => {
-            const failedResponses = responses.filter((response) => !response.ok);
-            if (failedResponses.length > 0) {
-                alert(`Erro ao deletar ${failedResponses.length} imagem(ns).`);
-            } else {
-                alert(`${ids.length} imagem(ns) deletada(s) com sucesso.`);
-            }
-
-            // Refresh data
-            refreshData();
-        })
-        .catch(() => {
-            alert('Erro ao deletar as imagens.');
-        });
-};
 
 const deleteImagesByYear = (year) => {
     if (
@@ -257,7 +241,6 @@ const refreshData = () => {
     refreshCountriesWithPhotos();
 };
 
-
 return (
     <Box>
         <Box mb={3}>
@@ -313,5 +296,6 @@ return (
     </Box>
 
 );
+};
 
 export default PhotoManager;
