@@ -70,7 +70,7 @@ public class SecurityConfig {
         // Sempre permitir localhost para desenvolvimento local
         configuration.setAllowedOrigins(List.of("https://personal-photomap-backend.onrender.com","http://localhost", "http://localhost:80", "http://localhost:5173"));
 
-        allowedOrigins.add("https://personal-photomap-backend.onrender.com")
+        allowedOrigins.add("https://personal-photomap-backend.onrender.com");
 
 //        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowCredentials(true);
