@@ -54,35 +54,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
 
+    // Permitir o frontend no Render e localhost para desenvolvimento
+    configuration.setAllowedOrigins(List.of(
+        "https://personal-photo-map-v2.onrender.com",  // Frontend no Render
+        "http://localhost",
+        "http://localhost:80",
+        "http://localhost:5173"
+    ));
 
-//        String frontendUrl = System.getenv("FRONTEND_URL");
+    configuration.setAllowCredentials(true);
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setExposedHeaders(List.of("Authorization"));
 
-
-        List<String> allowedOrigins = new ArrayList<>();
-
-//        if (frontendUrl != null && !frontendUrl.isEmpty()) {
-//            allowedOrigins.add(frontendUrl);
-//        }
-
-        // Sempre permitir localhost para desenvolvimento local
-        configuration.setAllowedOrigins(List.of("https://personal-photomap-backend.onrender.com","http://localhost", "http://localhost:80", "http://localhost:5173"));
-
-        allowedOrigins.add("https://personal-photomap-backend.onrender.com");
-
-//        configuration.setAllowedOrigins(allowedOrigins);
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+}
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // Define o encoder de senha como BCrypt
