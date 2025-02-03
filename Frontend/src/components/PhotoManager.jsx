@@ -75,9 +75,9 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
 
 
     const fetchImages = () => {
-        if (!selectedYear && !showAllSelected) {
-            return; // Do not fetch images if no year is selected and "Show all" is not selected
-        }
+        // if (!selectedYear && !showAllSelected) {
+        //     return; // Do not fetch images if no year is selected and "Show all" is not selected
+        // }
 
         let url = `${import.meta.env.VITE_BACKEND_URL}/api/images/${countryId}`;
         if (selectedYear && !showAllSelected) {
