@@ -24,12 +24,12 @@ public class S3Service {
 
             // Faz o upload para o S3
             s3Client.putObject(
-                b -> b.bucket(System.getenv("PHOTO_MAP_STORAGE_BUCKET")).key(fileName),
+                b -> b.bucket(System.getenv("S3_BUCKET_NAME")).key(fileName),
                 RequestBody.fromBytes(file.getBytes())
             );
 
             // Obtém a URL do arquivo
-            URL fileUrl = s3Client.utilities().getUrl(b -> b.bucket(System.getenv("PHOTO_MAP_STORAGE_BUCKET")).key(fileName));
+            URL fileUrl = s3Client.utilities().getUrl(b -> b.bucket(System.getenv("S3_BUCKET_NAME")).key(fileName));
 
             return fileUrl.toString();
         } catch (Exception e) {
