@@ -131,6 +131,8 @@ const PhotoGallery = ({ images, onDeleteSelectedImages, onCreateEvent }) => {
               alt={`Imagem do país ${index + 1}`}
               boxSize="200px"
               objectFit="cover"
+              loading="lazy"
+              fallbackSrc="https://via.placeholder.com/200"
               onClick={() => handleImageClick(index)}
             />
           </Box>
