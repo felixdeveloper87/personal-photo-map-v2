@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Text, Flex, Grid } from '@chakra-ui/react';
 import { Wrap, WrapItem } from '@chakra-ui/react';
 
+
 const PhotoManager = ({ countryId, onUploadSuccess }) => {
     const [images, setImages] = useState([]);
     const [years, setYears] = useState([]);

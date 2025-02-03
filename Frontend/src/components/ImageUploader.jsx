@@ -16,6 +16,8 @@ const ImageUploader = ({ countryId, onUpload, onUploadSuccess }) => {
     }
   };
 
+  
+
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};

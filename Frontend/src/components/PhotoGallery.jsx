@@ -21,6 +21,7 @@ const PhotoGallery = ({ images, onDeleteSelectedImages, onCreateEvent }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedImages, setSelectedImages] = useState([]);
 
+
   // 🔹 TESTE: Monitora a atualização de `images` no estado
   useEffect(() => {
     console.log("📸 Atualização do estado `images`:", images);
@@ -135,6 +136,7 @@ const PhotoGallery = ({ images, onDeleteSelectedImages, onCreateEvent }) => {
               fallbackSrc="https://via.placeholder.com/200"
               onClick={() => handleImageClick(index)}
             />
+
           </Box>
         ))}
       </Flex>
