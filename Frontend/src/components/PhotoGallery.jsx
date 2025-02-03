@@ -21,6 +21,17 @@ const PhotoGallery = ({ images, onDeleteSelectedImages, onCreateEvent }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedImages, setSelectedImages] = useState([]);
 
+  // 🔹 TESTE: Monitora a atualização de `images` no estado
+  useEffect(() => {
+    console.log("📸 Atualização do estado `images`:", images);
+    if (images && images.length > 0) {
+      window.images = images; // Torna `images` acessível no console
+      console.log("✅ `images` foi salvo no `window`.");
+    } else {
+      console.warn("⚠️ Nenhuma imagem carregada no array `images`.");
+    }
+  }, [images]);
+
   const handleImageClick = (index) => {
     setCurrentImageIndex(index);
     onOpen();

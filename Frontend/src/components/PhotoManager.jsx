@@ -22,6 +22,10 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
     };
 
     useEffect(() => {
+        console.log("🔄 Atualização do estado images:", images);
+      }, [images]);
+
+    useEffect(() => {
         const token = localStorage.getItem('token');
         setIsLoggedIn(!!token);
 
