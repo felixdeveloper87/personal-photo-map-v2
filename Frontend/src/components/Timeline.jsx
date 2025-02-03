@@ -1,6 +1,8 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useContext, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Text, Spinner } from '@chakra-ui/react';
+import { CountriesContext } from "../context/CountriesContext";
+
 
 // Lazy loading do PhotoGallery
 const LazyPhotoGallery = lazy(() => import('./PhotoGallery'));
@@ -9,6 +11,8 @@ const Timeline = () => {
   const [images, setImages] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  const { refreshCountriesWithPhotos } = useContext(CountriesContext);
 
   // Helper para pegar o token
   const getAuthHeaders = () => {
@@ -75,6 +79,7 @@ const Timeline = () => {
           alert(`Erro ao deletar ${failedResponses.length} imagem(ns).`);
         } else {
           alert(`${ids.length} imagem(ns) deletada(s) com sucesso.`);
+          refreshCountriesWithPhotos();
           fetchAllPhotos(); // Atualiza a lista de imagens após deletar
         }
       } catch (error) {
