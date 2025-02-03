@@ -44,7 +44,7 @@ const Timeline = () => {
 
       if (Array.isArray(data)) {
         const imageUrls = data.map((image) => ({
-          url: `${import.meta.env.VITE_BACKEND_URL}${image.filePath}`,
+          url: image.filePath,
           id: image.id,
           year: image.year,
         }));
