@@ -128,7 +128,7 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
         setTimeout(() => {
             console.log("🔄 Buscando imagens do backend após upload...");
             fetchImages();
-        }, 100); // Pequeno delay para garantir atualização antes do fetch
+        }, 2000); // Pequeno delay para garantir atualização antes do fetch
     };
     const deleteImages = (ids) => {
         if (ids.length === 0) {
