@@ -113,18 +113,23 @@ const PhotoManager = ({ countryId, onUploadSuccess }) => {
 
     const handleUpload = (newImages, year) => {
         setImages((prevImages) => [...prevImages, ...newImages]);
-
+    
         if (!years.includes(year)) {
             setYears((prevYears) => [...prevYears, year]);
         }
-
+    
         if (onUploadSuccess) {
             onUploadSuccess();
         }
+        
         refreshCountriesWithPhotos();
-        fetchImages();
+    
+        // Aguardar um pequeno delay antes de chamar fetchImages()
+        setTimeout(() => {
+            console.log("🔄 Buscando imagens do backend após upload...");
+            fetchImages();
+        }, 100); // Pequeno delay para garantir atualização antes do fetch
     };
-
     const deleteImages = (ids) => {
         if (ids.length === 0) {
             alert('Nenhuma imagem selecionada para deletar.');
