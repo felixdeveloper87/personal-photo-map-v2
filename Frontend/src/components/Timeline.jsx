@@ -40,9 +40,11 @@ const Timeline = () => {
       }
 
       const data = await response.json();
+      console.log("Fotos recebidas:", data); // <-- ADICIONE ESTE LOG
+
       if (Array.isArray(data)) {
         const imageUrls = data.map((image) => ({
-          url: image.filePath,
+          url: `${import.meta.env.VITE_BACKEND_URL}${image.filePath}`,
           id: image.id,
           year: image.year,
         }));
@@ -88,6 +90,8 @@ const Timeline = () => {
     }
   };
 
+
+
   // Exemplo de agrupamento por ano
   const sortedImages = [...images].sort((a, b) => b.year - a.year);
   const groupedByYear = sortedImages.reduce((acc, image) => {
@@ -120,6 +124,8 @@ const Timeline = () => {
                 onDeleteSelectedImages={deleteImages}
               />
             </Suspense>
+
+
           </Box>
         ))
       ) : (
