@@ -53,6 +53,36 @@ const Timeline = () => {
     }
   };
 
+  const deleteImages = async (ids) => {
+    if (!ids || ids.length === 0) {
+      alert('Nenhuma imagem selecionada para deletar.');
+      return;
+    }
+
+    if (window.confirm(`Tem certeza que deseja deletar ${ids.length} imagem(ns)?`)) {
+      try {
+        const deletePromises = ids.map((id) =>
+          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/delete/${id}`, {
+            method: "DELETE",
+            headers: getAuthHeaders(),
+          })
+        );
+
+        const responses = await Promise.all(deletePromises);
+        const failedResponses = responses.filter((response) => !response.ok);
+
+        if (failedResponses.length > 0) {
+          alert(`Erro ao deletar ${failedResponses.length} imagem(ns).`);
+        } else {
+          alert(`${ids.length} imagem(ns) deletada(s) com sucesso.`);
+          fetchAllPhotos(); // Atualiza a lista de imagens após deletar
+        }
+      } catch (error) {
+        alert("Erro ao deletar as imagens.");
+      }
+    }
+  };
+
   // Exemplo de agrupamento por ano
   const sortedImages = [...images].sort((a, b) => b.year - a.year);
   const groupedByYear = sortedImages.reduce((acc, image) => {
@@ -80,7 +110,10 @@ const Timeline = () => {
           <Box key={year} mb={8}>
             <Text fontSize="xl" mb={2}>{year}</Text>
             <Suspense fallback={<Spinner color="blue.500" size="xl" />}>
-              <LazyPhotoGallery images={groupedByYear[year]} />
+              <LazyPhotoGallery
+                images={groupedByYear[year]}
+                onDeleteSelectedImages={deleteImages}
+              />
             </Suspense>
           </Box>
         ))
