@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PhotoGallery from './PhotoGallery';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, Spinner } from '@chakra-ui/react';
+
+// Lazy loading do PhotoGallery
+const LazyPhotoGallery = lazy(() => import('./PhotoGallery'));
 
 const Timeline = () => {
   const [images, setImages] = useState([]);
@@ -38,8 +40,7 @@ const Timeline = () => {
         const imageUrls = data.map((image) => ({
           url: image.filePath,
           id: image.id,
-          year: image.year
-          // ... qualquer outra propriedade que você precise
+          year: image.year,
         }));
         setImages(imageUrls);
       } else {
@@ -78,7 +79,9 @@ const Timeline = () => {
         Object.keys(groupedByYear).map((year) => (
           <Box key={year} mb={8}>
             <Text fontSize="xl" mb={2}>{year}</Text>
-            <PhotoGallery images={groupedByYear[year]} />
+            <Suspense fallback={<Spinner color="blue.500" size="xl" />}>
+              <LazyPhotoGallery images={groupedByYear[year]} />
+            </Suspense>
           </Box>
         ))
       ) : (
