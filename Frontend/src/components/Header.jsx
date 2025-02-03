@@ -92,7 +92,7 @@ function Header() {
           {!isLoggedIn && (
             <Flex ml="auto" gap={4}>
               <Button colorScheme="teal" onClick={() => navigate('/login')}>
-                Sign inii
+                Sign in
               </Button>
               <Button colorScheme="teal" variant="outline" onClick={() => navigate('/register')}>
                 Sign up
