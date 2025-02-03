@@ -4,16 +4,21 @@ import { Box, Button, Input, Heading, NumberInput, NumberInputField, Flex } from
 const ImageUploader = ({ countryId, onUpload, onUploadSuccess }) => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [isUploading, setIsUploading] = useState(false);
-  const [files, setFiles] = useState([]); // Mantém os arquivos selecionados
-  const fileInputRef = useRef(null); // Referência para o input de arquivos
+  const [files, setFiles] = useState([]); // Armazena os arquivos selecionados
+  const fileInputRef = useRef(null);
 
   const handleFileSelection = (event) => {
     const selectedFiles = event.target.files;
     if (selectedFiles.length > 0) {
-      setFiles(selectedFiles); // Atualiza os arquivos selecionados
+      setFiles(Array.from(selectedFiles));
     } else {
-      setFiles([]); // Se nenhum arquivo for selecionado, reseta o estado
+      setFiles([]);
     }
+  };
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
   const handleImageUpload = async () => {
@@ -23,57 +28,43 @@ const ImageUploader = ({ countryId, onUpload, onUploadSuccess }) => {
     }
   
     const formData = new FormData();
-    formData.append("file", files[0]); // O S3 aceita apenas um arquivo por vez
+    // Adiciona todos os arquivos com o mesmo nome do parâmetro "images"
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
+    formData.append("countryId", countryId);
+    formData.append("year", year);
   
     setIsUploading(true);
   
     try {
-      // Upload da imagem para o S3
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/s3/upload`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/upload`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          ...getAuthHeaders(),
+          // NÃO defina o Content-Type manualmente; o browser fará isso automaticamente (incluindo o boundary).
         },
         body: formData,
       });
   
       if (!response.ok) {
-        throw new Error('Erro ao enviar imagem para o S3.');
+        throw new Error('Erro ao enviar imagem(s) para o servidor.');
       }
   
       const data = await response.json();
-      const imageUrl = data.imageUrls[0]; // URL da imagem no S3
+      // Supondo que o backend retorne { message, imageUrls }
+      const uploadedImageUrls = data.imageUrls;
+      alert('Imagem(s) enviada(s) com sucesso!');
   
-      // Agora salvamos essa URL no banco
-      const saveResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/save`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          countryId,
-          year,
-          email: localStorage.getItem('email'), // Certifique-se de ter o email do usuário salvo
-          fileName: files[0].name,
-          filePath: imageUrl, // URL do S3
-        }),
-      });
-  
-      if (!saveResponse.ok) {
-        throw new Error('Erro ao salvar URL da imagem no banco de dados.');
+      if (onUpload) {
+        onUpload(uploadedImageUrls, year);
       }
-  
-      alert('Imagem enviada e salva com sucesso!');
-  
-      onUpload([{ url: imageUrl }], year);
-      
       if (onUploadSuccess) {
         onUploadSuccess();
       }
   
-      setFiles([]); // Limpar o input
-  
+      setFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = null;
     } catch (error) {
       console.error('Erro ao fazer upload:', error);
       alert(`Erro ao fazer upload: ${error.message}`);
@@ -89,21 +80,20 @@ const ImageUploader = ({ countryId, onUpload, onUploadSuccess }) => {
       <Flex justify="space-between" align="center" mb={4}>
         <NumberInput
           value={year}
-          onChange={(valueString) => setYear(valueString)}
+          onChange={(valueString) => setYear(Number(valueString))}
           min={1900}
           max={new Date().getFullYear()}
           width="150px"
         >
           <NumberInputField placeholder="Year" />
         </NumberInput>
-
         <Input
           type="file"
           onChange={handleFileSelection}
           multiple
           accept=".jpg,.jpeg"
           width="auto"
-          ref={fileInputRef} // Adiciona referência ao campo de input
+          ref={fileInputRef}
         />
       </Flex>
 
@@ -113,7 +103,7 @@ const ImageUploader = ({ countryId, onUpload, onUploadSuccess }) => {
         colorScheme="teal"
         width="100%"
         onClick={handleImageUpload}
-        disabled={files.length === 0} // Desabilita o botão se não houver arquivos selecionados
+        disabled={files.length === 0}
       >
         Upload
       </Button>

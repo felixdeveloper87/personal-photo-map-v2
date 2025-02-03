@@ -5,72 +5,72 @@ import com.personalphotomap.repository.ImageRepository;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ImageService {
 
     @Autowired
     private ImageRepository imageRepository;
+    
+    @Autowired
+    private S3Service s3Service; // Injeção do S3Service para realizar o upload e a deleção no S3
 
-    private final String uploadDir = System.getProperty("user.dir") + "/api/images/uploads/";
-
+    /**
+     * Realiza o upload das imagens utilizando o S3 e salva os metadados no banco de dados.
+     * Apenas arquivos do tipo image/jpeg são considerados.
+     */
     public List<String> uploadImages(List<MultipartFile> files, String countryId, int year, String username) throws IOException {
         List<String> imageUrls = new ArrayList<>();
         Tika tika = new Tika();
 
-        Path uploadPath = Paths.get(uploadDir + countryId);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
         for (MultipartFile file : files) {
-            if (file.isEmpty()) continue;
+            if (file.isEmpty()) {
+                continue;
+            }
 
             String mimeType = tika.detect(file.getInputStream());
-            if (!mimeType.equalsIgnoreCase("image/jpeg")) continue;
+            if (!mimeType.equalsIgnoreCase("image/jpeg")) {
+                continue;
+            }
 
-            String fileName = UUID.randomUUID() + "_" + StringUtils.cleanPath(file.getOriginalFilename());
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            // Faz o upload para o S3 e obtém a URL do arquivo
+            String fileUrl = s3Service.uploadFile(file);
 
+            // Cria a entidade Image com os metadados e a URL retornada pelo S3
             Image image = new Image();
             image.setCountryId(countryId);
-            image.setFileName(fileName);
-            image.setFilePath("/api/images/uploads/" + countryId + "/" + fileName);
+            image.setFileName(file.getOriginalFilename()); // ou gere um nome se preferir
+            image.setFilePath(fileUrl);  // Armazena a URL do S3
             image.setYear(year);
             image.setEmail(username);
 
-            String backendUrl = System.getenv("BACKEND_URL");
-            if (backendUrl == null || backendUrl.isEmpty()) {
-                backendUrl = "http://localhost:8092"; // Usa localhost se a variável não estiver definida
-            }
-
-            imageUrls.add(backendUrl + image.getFilePath());
-
+            imageRepository.save(image);
+            imageUrls.add(fileUrl);
         }
         return imageUrls;
     }
 
-    public List<Image> getImagesByCountryAndYear(String countryId, int year, String email) {
-        return imageRepository.findByCountryIdAndYearAndEmail(countryId, year, email);
+    /**
+     * Exclui as imagens tanto do S3 quanto do banco de dados.
+     */
+    public void deleteImages(List<Image> images) {
+        for (Image image : images) {
+            // Chama o método do S3Service para deletar o arquivo no S3
+            s3Service.deleteFile(image.getFilePath());
+        }
+        // Remove os registros do banco de dados
+        imageRepository.deleteAll(images);
     }
 
-
-    public void deleteImages(List<Image> images) throws IOException {
-        for (Image image : images) {
-            Path imagePath = Paths.get(System.getProperty("user.dir") + image.getFilePath());
-            if (Files.exists(imagePath)) {
-                Files.delete(imagePath);
-            }
-        }
-        imageRepository.deleteAll(images);
+    /**
+     * Exemplo de método para buscar imagens por país, ano e email.
+     */
+    public List<Image> getImagesByCountryAndYear(String countryId, int year, String email) {
+        return imageRepository.findByCountryIdAndYearAndEmail(countryId, year, email);
     }
 }
