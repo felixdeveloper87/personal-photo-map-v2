@@ -126,7 +126,6 @@ export const CountriesProvider = ({ children }) => {
             const data = await response.json();
             console.log("📅 Anos disponíveis recebidos:", data);
             setAvailableYears(data && Array.isArray(data) ? data : []);
-            setAvailableYears(data);
         } catch (error) {
             console.error('Erro ao buscar anos disponíveis:', error);
             setAvailableYears([]);
@@ -139,8 +138,8 @@ export const CountriesProvider = ({ children }) => {
      */
     const refreshCountriesWithPhotos = async () => {
         setLoading(true); // Set the loading state to true while data is being fetched
-        await Promise.all([fetchCounts(), fetchCountriesWithPhotos()]); // Execute both fetch operations in parallel
-    };
+        await Promise.all([fetchCounts(), fetchCountriesWithPhotos(), fetchAvailableYears()]); // Execute both fetch operations in parallel
+    };;
 
     /**
      * useEffect - Effect for monitoring token changes and triggering data refresh
