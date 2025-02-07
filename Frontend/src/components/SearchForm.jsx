@@ -68,7 +68,7 @@ export default function SearchForm({ countriesWithPhotos, onSearch }) {
                 <div style={{ marginBottom: '1rem' }}>
                   <label>Year:</label>
                   <DropdownList
-                    data={availableYears.map((year) => ({ value: year, label: year }))}
+                    data={availableYears}
                     value={selectedYear}
                     onChange={(value) => setSelectedYear(value.value)} // Garantido que o valor correto seja capturado
                     placeholder="Select a year"

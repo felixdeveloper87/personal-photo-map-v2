@@ -66,7 +66,7 @@ const Register = () => {
         setSuccess('Registro bem-sucedido!');
         setError('');
         setTimeout(() => {
-          navigate('/login'); // ✅ Redireciona para a página de login após 2 segundos
+          navigate('/login'); 
         }, 2000);
         setFullname('');
         setEmail('');
