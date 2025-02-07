@@ -22,7 +22,7 @@ public class ImageController {
 
     @Autowired
     private JwtUtil jwtUtil;
-    
+
     // Injeta o serviço do S3 para operações de upload e deleção
     @Autowired
     private S3Service s3Service;
@@ -139,7 +139,8 @@ public class ImageController {
 
         List<Image> images = imageRepository.findByCountryIdAndYearAndEmail(countryId, year, email);
         if (images.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma imagem encontrada para o ano " + year + ".");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Nenhuma imagem encontrada para o ano " + year + ".");
         }
 
         // Deleta cada arquivo do S3
@@ -172,7 +173,8 @@ public class ImageController {
         if (optionalImage.isPresent()) {
             Image image = optionalImage.get();
             if (!image.getEmail().equals(email)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para deletar esta imagem.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Você não tem permissão para deletar esta imagem.");
             }
 
             try {
@@ -226,25 +228,37 @@ public class ImageController {
         return ResponseEntity.ok(countries);
     }
 
-    // Endpoint para retornar todas as imagens do usuário, ordenadas por data de upload
+    @GetMapping("/available-years")
+    public ResponseEntity<List<Integer>> getAvailableYears(@RequestHeader(value = "Authorization") String token) {
+        String email = jwtUtil.extractUsernameFromToken(token);
+        List<Integer> years = imageRepository.findDistinctYearsByUser(email);
+        return ResponseEntity.ok(years);
+    }
+
+    // Endpoint para retornar todas as imagens do usuário, ordenadas por data de
+    // upload
     @GetMapping("/allPictures")
     public ResponseEntity<List<Image>> getAllImages(
-            @RequestHeader(value = "Authorization") String token) {
+            @RequestHeader(value = "Authorization") String token,
+            @RequestParam(required = false) Integer year) {
 
         String email = jwtUtil.extractUsernameFromToken(token);
         if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        List<Image> images = imageRepository.findByEmailOrderByUploadDateDesc(email);
-        if (images.isEmpty()) {
-            return ResponseEntity.ok(Collections.emptyList());
+        List<Image> images;
+        if (year != null) {
+            images = imageRepository.findByEmailAndYear(email, year);
+        } else {
+            images = imageRepository.findByEmailOrderByUploadDateDesc(email);
         }
 
         return ResponseEntity.ok(images);
     }
 
-    // Endpoint para retornar os anos (datas) em que há imagens para um país específico
+    // Endpoint para retornar os anos (datas) em que há imagens para um país
+    // específico
     @GetMapping("/{countryId}/years")
     public ResponseEntity<List<Integer>> getYearsByCountry(
             @PathVariable String countryId,
@@ -259,7 +273,8 @@ public class ImageController {
         return ResponseEntity.ok(years);
     }
 
-    // Endpoint para retornar as imagens de um país e ano específico para o usuário autenticado
+    // Endpoint para retornar as imagens de um país e ano específico para o usuário
+    // autenticado
     @GetMapping("/{countryId}/{year}")
     public ResponseEntity<List<Image>> getImagesByCountryAndYear(
             @PathVariable String countryId,
@@ -275,7 +290,8 @@ public class ImageController {
         return ResponseEntity.ok(images);
     }
 
-    // Endpoint para retornar a contagem total de fotos e de países únicos do usuário
+    // Endpoint para retornar a contagem total de fotos e de países únicos do
+    // usuário
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> countUserPhotosAndCountries(
             @RequestHeader(value = "Authorization") String token) {

@@ -36,10 +36,15 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     @Query("SELECT i FROM Image i ORDER BY i.uploadDate DESC")
     List<Image> findAllOrderedByUploadDateDesc();
 
-    // Buscar anos distintos em que um usuário enviou imagens para um determinado país
+    @Query("SELECT DISTINCT i.year FROM Image i WHERE i.email = :email ORDER BY i.year DESC")
+    List<Integer> findDistinctYearsByUser(@Param("email") String email);
+
+    @Query("SELECT i FROM Image i WHERE i.email = :email AND i.year = :year ORDER BY i.uploadDate DESC")
+    List<Image> findByEmailAndYear(@Param("email") String email, @Param("year") Integer year);
+
     @Query("SELECT DISTINCT i.year FROM Image i WHERE i.countryId = :countryId AND i.email = :email ORDER BY i.year")
     List<Integer> findDistinctYearsByCountryIdAndEmail(@Param("countryId") String countryId, @Param("email") String email);
-    // Método para contar o número de países distintos onde o usuário tem fotos
+    
     @Query("SELECT COUNT(DISTINCT i.countryId) FROM Image i WHERE i.email = :email")
     long countDistinctCountryByEmail(@Param("email") String email);
 }

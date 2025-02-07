@@ -15,13 +15,15 @@ export const CountriesContext = createContext();
 export const CountriesProvider = ({ children }) => {
     // State for storing countries that have associated photos
     const [countriesWithPhotos, setCountriesWithPhotos] = useState([]);
+    // State for storing available years
+    const [availableYears, setAvailableYears] = useState([]);
     // State for tracking whether data is still loading
     const [loading, setLoading] = useState(true);
     // State for the total number of photos uploaded
     const [photoCount, setPhotoCount] = useState(0);
     // State for the total number of countries with photos
     const [countryCount, setCountryCount] = useState(0);
-
+ 
     /**
      * fetchCounts - Fetches the total photo count and country count from the backend API
      * This function retrieves aggregated metrics and updates the respective state variables.
@@ -101,6 +103,37 @@ export const CountriesProvider = ({ children }) => {
     };
 
     /**
+     * fetchAvailableYears - Busca os anos disponíveis no backend
+     */
+    const fetchAvailableYears = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAvailableYears([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/images/available-years`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao buscar anos disponíveis');
+            }
+
+            const data = await response.json();
+            console.log("📅 Anos disponíveis recebidos:", data);
+            setAvailableYears(data && Array.isArray(data) ? data : []);
+            setAvailableYears(data);
+        } catch (error) {
+            console.error('Erro ao buscar anos disponíveis:', error);
+            setAvailableYears([]);
+        }
+    };
+
+    /**
      * refreshCountriesWithPhotos - Refreshes both the counts and the countries with photos
      * This function ensures all relevant data is fetched and updated simultaneously.
      */
@@ -145,6 +178,7 @@ export const CountriesProvider = ({ children }) => {
                 loading,
                 photoCount,
                 countryCount,
+                availableYears,
                 refreshCountriesWithPhotos,
             }}
         >

@@ -41,6 +41,7 @@ function App() {
                 element={<CountryDetails onUploadSuccess={handleUploadCounts} />}
               />
               <Route path="/timeline" element={<TimelinePage />} />
+              <Route path="/timeline/:year" element={<TimelinePage />} />
               <Route path="*" element={<NotFound />} /> {/* Página 404 */}
             </Routes>
           </Box>
