@@ -28,7 +28,7 @@ const Timeline = ({ selectedYear }) => {
     fetchAllPhotos();
   }, [navigate, selectedYear]);
 
-  const fetchAllPhotos = async () => {
+  const fetchPhotos = async () => {
     try {
       let url = `${import.meta.env.VITE_BACKEND_URL}/api/images/allPictures`;
       if (selectedYear) {
@@ -54,7 +54,7 @@ const Timeline = ({ selectedYear }) => {
 
       if (Array.isArray(data)) {
         setImages(data.map(image => ({
-          url: `${import.meta.env.VITE_BACKEND_URL}${image.filePath}`,
+          url: image.filePath,
           id: image.id,
           year: image.year,
         })));
