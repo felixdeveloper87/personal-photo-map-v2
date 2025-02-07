@@ -8,7 +8,7 @@ function TimelinePage() {
   console.log("📅 Ano capturado da URL:", year);
   return (
     <Box p={4} maxW="1600px" mx="auto">
-      <Timeline />
+      <Timeline selectedYear={year} />
     </Box>
   );
 }
