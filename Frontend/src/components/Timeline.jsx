@@ -25,7 +25,7 @@ const Timeline = ({ selectedYear }) => {
       navigate('/login');
       return;
     }
-    fetchAllPhotos();
+    fetchPhotos();
   }, [navigate, selectedYear]);
 
   const fetchPhotos = async () => {
@@ -91,7 +91,7 @@ const Timeline = ({ selectedYear }) => {
         } else {
           alert(`${ids.length} imagem(ns) deletada(s) com sucesso.`);
           refreshCountriesWithPhotos();
-          fetchAllPhotos(); // Atualiza a lista de imagens após deletar
+          fetchPhotos(); // Atualiza a lista de imagens após deletar
         }
       } catch (error) {
         alert("Erro ao deletar as imagens.");
