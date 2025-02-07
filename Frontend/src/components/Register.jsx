@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Input, Button, Heading, FormControl, FormLabel, FormErrorMessage, Text, Select } from '@chakra-ui/react';
 
 const Register = () => {
@@ -13,7 +14,7 @@ const Register = () => {
   useEffect(() => {
     console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
   }, []);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -64,6 +65,9 @@ const Register = () => {
       if (response.ok) {
         setSuccess('Registro bem-sucedido!');
         setError('');
+        setTimeout(() => {
+          navigate('/login'); // ✅ Redireciona para a página de login após 2 segundos
+        }, 2000);
         setFullname('');
         setEmail('');
         setPassword('');

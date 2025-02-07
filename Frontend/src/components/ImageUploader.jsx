@@ -23,6 +23,8 @@ const ImageUploader = ({ countryId, onUpload, onUploadSuccess }) => {
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
+  //responsible to send the image to backend
+
   const handleImageUpload = async () => {
     if (files.length === 0) {
       alert('Nenhum arquivo selecionado.');
